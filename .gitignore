@@ -1,0 +1,12 @@
+*.class
+
+bin
+
+.mtj.tmp/
+
+*.jar
+*.war
+*.ear
+
+# virtual machine crash logs
+hs_err_pid*
