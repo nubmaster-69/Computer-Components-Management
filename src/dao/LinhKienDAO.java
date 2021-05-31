@@ -12,7 +12,7 @@ import entity.LinhKien;
 public class LinhKienDAO {
 
 	private Connection con;
-
+	
 	public LinhKienDAO() {
 		try {
 			con = ConnectDatabase.getConnection();
@@ -23,83 +23,78 @@ public class LinhKienDAO {
 
 	public ArrayList<LinhKien> getComponents() throws SQLException {
 		ArrayList<LinhKien> lks = new ArrayList<>();
-
-		String query = "Select * from LinhKien";
-
-		ResultSet res = con.createStatement().executeQuery(query);
-
-		while (res.next())
-			lks.add(new LinhKien(res.getString(1), res.getString(2), res.getString(3), res.getString(4),
-					res.getDouble(5), res.getString(6), res.getInt(7), res.getDate(8), res.getInt(9)));
-
-		return lks;
-	}
-
-	public ArrayList<LinhKien> searchComponentAppoximate(String maLK) throws SQLException {
-		ArrayList<LinhKien> lks = new ArrayList<>();
-
-		String query = "Select * from LinhKien where maLinhKien like ?";
 		
-		PreparedStatement pState = con.prepareStatement(query);
-		pState.setString(1, maLK + "%");
-
-		ResultSet res = pState.executeQuery();
+		String query = "Select * from LinhKien";
+		
+		ResultSet res = con.createStatement().executeQuery(query);
 		
 		while(res.next())
-			lks.add(new LinhKien(res.getString(1), res.getString(2), res.getString(3), res.getString(4),
-					res.getDouble(5), res.getString(6), res.getInt(7), res.getDate(8), res.getInt(9)));
-
+			lks.add(new LinhKien(res.getString(1), res.getString(2), res.getString(3),
+					res.getString(4), res.getDouble(5), res.getString(6),
+					res.getInt(7), res.getDate(8), res.getInt(9)));
+		
 		return lks;
 	}
 	
-	public static void main(String[] args) {
-		try {
-			System.out.println(new LinhKienDAO().searchComponentAppoximate("LK00001").size());
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public ArrayList<LinhKien> getComponentByKeyMa(String maLK) throws SQLException {
+		ArrayList<LinhKien> lks = new ArrayList<>();
+		
+		String query = "Select * from LinhKien where maLinhKien like ? ";
+		
+		PreparedStatement pState = con.prepareStatement(query);
+		
+		pState.setString(1, maLK);
+		
+		ResultSet res = pState.executeQuery();
+		
+		while(res.next())
+			lks.add(new LinhKien(res.getString(1), res.getString(2), res.getString(3),
+					res.getString(4), res.getDouble(5), res.getString(6),
+					res.getInt(7), res.getDate(8), res.getInt(9)));
+		
+		return lks;
 	}
-
+	
 	public LinhKien getComponentByID(String maLK) throws SQLException {
 		LinhKien lk = null;
-
+		
 		String query = "Select * from LinhKien where maLinhKien = ?";
-
+		
 		PreparedStatement pState = con.prepareStatement(query);
-
+		
 		pState.setString(1, maLK);
-
+		
 		ResultSet res = pState.executeQuery();
-
-		while (res.next())
-			lk = new LinhKien(res.getString(1), res.getString(2), res.getString(3), res.getString(4), res.getDouble(5),
-					res.getString(6), res.getInt(7), res.getDate(8), res.getInt(9));
-
+		
+		while(res.next())
+			lk = new LinhKien(res.getString(1), res.getString(2), res.getString(3),
+					res.getString(4), res.getDouble(5), res.getString(6),
+					res.getInt(7), res.getDate(8), res.getInt(9));
+		
 		return lk;
 	}
-
+	
 	public String getComponentDescription(String maLK) throws SQLException {
 		String desc = "";
-
+		
 		String query = "Select moTa from linhKien where maLinhKien = ?";
-
+		
 		PreparedStatement pState = con.prepareStatement(query);
 		pState.setString(1, maLK);
-
-		ResultSet res = pState.executeQuery();
-
-		while (res.next())
+		
+		ResultSet res = pState.executeQuery();  
+		
+		while(res.next())
 			desc = res.getString(1);
-
+		
 		return desc;
 	}
-
+	
 	public boolean addComponent(LinhKien lk) throws SQLException {
 		String query = "insert LinhKien values(?, ?, ?, ? ,? ,? ,? ,? ,?)";
-
+		
 		PreparedStatement pState = con.prepareStatement(query);
-
+		
 		pState.setString(1, lk.getMaLK());
 		pState.setString(2, lk.getTenLk());
 		pState.setString(3, lk.getLoaiLK());
@@ -109,27 +104,27 @@ public class LinhKienDAO {
 		pState.setInt(7, lk.getSoLuongTon());
 		pState.setDate(8, lk.getNgayNhap());
 		pState.setInt(9, lk.getBaoHanh());
-
+		
 		return pState.executeUpdate() > 0;
 	}
-
+	
 	public boolean removeComponentByID(String maLK) throws SQLException {
-
+		
 		String query = "delete LinhKien where maLinhKien = ?";
 		PreparedStatement pState = con.prepareStatement(query);
-
+		
 		pState.setString(1, maLK);
-
+		
 		return pState.executeUpdate() > 0;
 	}
 
-	public boolean updateComponentByID(String maLK, LinhKien lk) throws SQLException {
+	public boolean updateComponentByID(String maLK, LinhKien lk) throws SQLException{
 		String query = "update LinhKien set tenLinhKien = ?, loaiLinhKien = ?,"
 				+ " moTa = ?, donGia = ?, thuongHieu = ?,"
 				+ " soLuongTon = ?, ngayNhap = ?, baoHanh = ? where maLinhKien = ?";
-
+		
 		PreparedStatement pState = con.prepareStatement(query);
-
+		
 		pState.setString(1, lk.getTenLk());
 		pState.setString(2, lk.getLoaiLK());
 		pState.setString(3, lk.getMoTa());
@@ -138,9 +133,83 @@ public class LinhKienDAO {
 		pState.setInt(6, lk.getSoLuongTon());
 		pState.setDate(7, lk.getNgayNhap());
 		pState.setInt(8, lk.getBaoHanh());
-
+		
 		pState.setString(9, maLK);
-
+		
 		return pState.executeUpdate() > 0;
+	}
+	
+	public ArrayList<LinhKien> getComponentByName(String Name) throws SQLException {
+		ArrayList<LinhKien> lks = new ArrayList<>();
+		
+		String query = "Select * from LinhKien where tenLinhKien like ? ";
+		
+		PreparedStatement pState = con.prepareStatement(query);
+		
+		pState.setString(1, Name);
+		
+		ResultSet res = pState.executeQuery();
+		
+		while(res.next())
+			lks.add(new LinhKien(res.getString(1), res.getString(2), res.getString(3),
+					res.getString(4), res.getDouble(5), res.getString(6),
+					res.getInt(7), res.getDate(8), res.getInt(9)));
+		
+		return lks;
+	}
+	
+	public ArrayList<LinhKien> getComponentByCategory(String category) throws SQLException {
+		ArrayList<LinhKien> lks = new ArrayList<>();
+		
+		String query = "Select * from LinhKien where loaiLinhKien like ? ";
+		
+		PreparedStatement pState = con.prepareStatement(query);
+		
+		pState.setString(1, category);
+		
+		ResultSet res = pState.executeQuery();
+		
+		while(res.next())
+			lks.add(new LinhKien(res.getString(1), res.getString(2), res.getString(3),
+					res.getString(4), res.getDouble(5), res.getString(6),
+					res.getInt(7), res.getDate(8), res.getInt(9)));
+		
+		return lks;
+	}
+	
+	public ArrayList<LinhKien> getComponentByThuongHieu(String thuongHieu) throws SQLException {
+		ArrayList<LinhKien> lks = new ArrayList<>();
+		
+		String query = "Select * from LinhKien where thuongHieu like ? ";
+		
+		PreparedStatement pState = con.prepareStatement(query);
+		
+		pState.setString(1, thuongHieu);
+		
+		ResultSet res = pState.executeQuery();
+		
+		while(res.next())
+			lks.add(new LinhKien(res.getString(1), res.getString(2), res.getString(3),
+					res.getString(4), res.getDouble(5), res.getString(6),
+					res.getInt(7), res.getDate(8), res.getInt(9)));
+		
+		return lks;
+	}
+	
+	public ArrayList<LinhKien> getSlowOnSaleComponents() throws SQLException {
+		ArrayList<LinhKien> comps = new ArrayList<>();
+		
+		String query = "select * from LinhKien\r\n"
+				+ "where maLinhKien not in (select maLinhKien from ChiTietHoaDon)\r\n"
+				+ "order by ngayNhap";
+		
+		ResultSet res = con.createStatement().executeQuery(query);
+		
+		while(res.next())
+			comps.add(new LinhKien(res.getString(1), res.getString(2), res.getString(3),
+					res.getString(4), res.getDouble(5), res.getString(6),
+					res.getInt(7), res.getDate(8), res.getInt(9)));
+		
+		return comps;
 	}
 }

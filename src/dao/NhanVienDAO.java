@@ -1,6 +1,7 @@
 package dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 import connectDatabase.ConnectDatabase;
+import entity.KhachHang;
 import entity.NhanVien;
 
 public class NhanVienDAO {
@@ -114,5 +116,43 @@ public class NhanVienDAO {
 		pState.setString(8, maNhanVien);
 
 		return pState.executeUpdate() > 0;
+	}
+	
+	public ArrayList<NhanVien> getCusBySTD(String STD) throws SQLException {
+		ArrayList<NhanVien> NV = new ArrayList<>();
+		
+		String query = "select * from NhanVien where maNhanVien like ? ";
+		
+		PreparedStatement pState = con.prepareStatement(query);
+		
+		pState.setString(1, STD);
+		
+		ResultSet res = pState.executeQuery();
+		
+		while(res.next()) {
+			NV.add(new NhanVien(res.getString(1), res.getString(2), res.getString(3), res.getDate(4), res.getString(5),
+					res.getString(6), res.getString(7), res.getString(8)));
+		}
+		
+		return NV;
+	}
+	
+	public ArrayList<NhanVien> getCusByName(String STD) throws SQLException {
+		ArrayList<NhanVien> NV = new ArrayList<>();
+		
+		String query = "select * from NhanVien where hoTenNV like ? ";
+		
+		PreparedStatement pState = con.prepareStatement(query);
+		
+		pState.setString(1, STD);
+		
+		ResultSet res = pState.executeQuery();
+		
+		while(res.next()) {
+			NV.add(new NhanVien(res.getString(1), res.getString(2), res.getString(3), res.getDate(4), res.getString(5),
+					res.getString(6), res.getString(7), res.getString(8)));
+		}
+		
+		return NV;
 	}
 }

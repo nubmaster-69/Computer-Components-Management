@@ -24,7 +24,7 @@ public class ChiTietHoaDonDAO {
 		ArrayList<String> cthds = new ArrayList<>();
 		
 		String query = "select kh.hoTenKH, kh.maKhachHang, kh.diaChiKH, kh.soDienThoaiKH, lk.maLinhKien, lk.tenLinhKien,"
-				+ "lk.loaiLinhKien, lk.thuongHieu, lk.soLuongTon, lk.donGia from ChiTietHoaDon cthd "
+				+ "lk.loaiLinhKien, lk.thuongHieu, cthd.soLuong, lk.donGia from ChiTietHoaDon cthd "
 				+ "join HoaDon hd on hd.maHoaDon = cthd.maHoaDon "
 				+ "join LinhKien lk on lk.maLinhKien = cthd.maLinhKien "
 				+ "join KhachHang kh on hd.maKhachHang = kh.maKhachHang "
@@ -55,4 +55,181 @@ public class ChiTietHoaDonDAO {
 		
 		return pState.executeUpdate() > 0;
 	}
+	
+	public String getProductTop1Selling(String time) throws SQLException {
+		String nameSp = "";
+		String query ="";
+		switch (time.toUpperCase()) {
+		case "DAY": {
+			query = "select top 1 lk.maLinhKien,tenLinhKien,sum(soLuong) from HoaDon as h \r\n"
+					+ "join ChiTietHoaDon as cthd on h.maHoaDon = cthd.maHoaDon\r\n"
+					+ "join LinhKien as lk on cthd.maLinhKien = lk.maLinhKien\r\n"
+					+ "where day(ngayLapHoaDon) = day(getdate())\r\n"
+					+ "and month(ngayLapHoaDon) = month(getdate())\r\n"
+					+ "and year(ngayLapHoaDon) = year(getdate())\r\n"
+					+ "group by lk.maLinhKien,tenLinhKien\r\n"
+					+ "order by sum(soLuong) desc";
+			break;
+		}
+		case "MONTH": {
+			query = "select top 1 lk.maLinhKien,tenLinhKien,sum(soLuong) from HoaDon as h \r\n"
+					+ "join ChiTietHoaDon as cthd on h.maHoaDon = cthd.maHoaDon\r\n"
+					+ "join LinhKien as lk on cthd.maLinhKien = lk.maLinhKien\r\n"
+					+ "where month(ngayLapHoaDon) = month(getdate())\r\n"
+					+ "and year(ngayLapHoaDon) = year(getdate())\r\n"
+					+ "group by lk.maLinhKien,tenLinhKien\r\n"
+					+ "order by sum(soLuong) desc";
+			break;
+		}
+		case "YEAR": {
+			query = "select top 1 lk.maLinhKien,tenLinhKien,sum(soLuong) from HoaDon as h \r\n"
+					+ "join ChiTietHoaDon as cthd on h.maHoaDon = cthd.maHoaDon\r\n"
+					+ "join LinhKien as lk on cthd.maLinhKien = lk.maLinhKien\r\n"
+					+ "where year(ngayLapHoaDon) = year(getdate())\r\n"
+					+ "group by lk.maLinhKien,tenLinhKien\r\n"
+					+ "order by sum(soLuong) desc";
+			break;
+		}
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + time);
+		}
+		 
+		
+		ResultSet res = con.createStatement().executeQuery(query);
+		while(res.next()) {
+			nameSp = res.getString(2) + "/Đã bán:"+res.getString(3);
+		}
+		return nameSp;
+	}
+	
+	public double getSumTotal(String time) throws SQLException {
+		double SumTotal = 0;
+		String query = "";
+		switch (time.toUpperCase()) {
+		case "DAY": {
+			query = "select sum(soLuong * donGia) from HoaDon as h \r\n"
+						+ "join ChiTietHoaDon as cthd on h.maHoaDon = cthd.maHoaDon\r\n"
+						+ "join KhachHang as kh on h.maKhachHang = kh.maKhachHang\r\n"
+						+ "join LinhKien as lk on cthd.maLinhKien = lk.maLinhKien\r\n"
+						+ "where day(ngayLapHoaDon) = day(getdate())\r\n"
+						+ "and month(ngayLapHoaDon) = month(getdate())\r\n"
+						+ "and year(ngayLapHoaDon) = year(getdate())";
+			break;
+		}
+		case "MONTH": {
+			query = "select sum(soLuong * donGia) from HoaDon as h \r\n"
+					+ "join ChiTietHoaDon as cthd on h.maHoaDon = cthd.maHoaDon\r\n"
+					+ "join KhachHang as kh on h.maKhachHang = kh.maKhachHang\r\n"
+					+ "join LinhKien as lk on cthd.maLinhKien = lk.maLinhKien\r\n"
+					+ "where month(ngayLapHoaDon) = month(getdate())\r\n"
+					+ "and year(ngayLapHoaDon) = year(getdate())";
+			break;
+		}
+		case "YEAR": {
+			query = "select sum(soLuong * donGia) from HoaDon as h \r\n"
+					+ "join ChiTietHoaDon as cthd on h.maHoaDon = cthd.maHoaDon\r\n"
+					+ "join KhachHang as kh on h.maKhachHang = kh.maKhachHang\r\n"
+					+ "join LinhKien as lk on cthd.maLinhKien = lk.maLinhKien\r\n"
+					+ "where year(ngayLapHoaDon) = year(getdate())";
+			break;
+		}
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + time);
+		}
+		
+		ResultSet res = con.createStatement().executeQuery(query);
+		while(res.next()) {
+			SumTotal = res.getDouble(1);
+		}
+		return SumTotal;
+	}
+	
+	public String getCusTop1Buy(String time) throws SQLException {
+		String nameCus = "";
+		String query = "";
+		switch (time.toUpperCase()) {
+		case "DAY": {
+			query = "select top 1 hoTenKH,soDienThoaiKH from HoaDon as h \r\n"
+					+ "join ChiTietHoaDon as cthd on h.maHoaDon = cthd.maHoaDon\r\n"
+					+ "join KhachHang as kh on h.maKhachHang = kh.maKhachHang\r\n"
+					+ "join LinhKien as lk on cthd.maLinhKien = lk.maLinhKien\r\n"
+					+ "where day(ngayLapHoaDon) = day(getdate())\r\n"
+					+ "and month(ngayLapHoaDon) = month(getdate())\r\n"
+					+ "and year(ngayLapHoaDon) = year(getdate())\r\n"
+					+ "order by soLuong * donGia desc";
+			break;
+		}
+		case "MONTH": {
+			query = "select top 1 hoTenKH,soDienThoaiKH from HoaDon as h \r\n"
+					+ "join ChiTietHoaDon as cthd on h.maHoaDon = cthd.maHoaDon\r\n"
+					+ "join KhachHang as kh on h.maKhachHang = kh.maKhachHang\r\n"
+					+ "join LinhKien as lk on cthd.maLinhKien = lk.maLinhKien\r\n"
+					+ "where month(ngayLapHoaDon) = month(getdate())\r\n"
+					+ "and year(ngayLapHoaDon) = year(getdate())\r\n"
+					+ "order by soLuong * donGia desc";
+			break;
+		}
+		case "YEAR": {
+			query = "select top 1 hoTenKH,soDienThoaiKH from HoaDon as h \r\n"
+					+ "join ChiTietHoaDon as cthd on h.maHoaDon = cthd.maHoaDon\r\n"
+					+ "join KhachHang as kh on h.maKhachHang = kh.maKhachHang\r\n"
+					+ "join LinhKien as lk on cthd.maLinhKien = lk.maLinhKien\r\n"
+					+ "where year(ngayLapHoaDon) = year(getdate())\r\n"
+					+ "order by soLuong * donGia desc";
+			break;
+		}
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + time);
+		}
+		
+		ResultSet res = con.createStatement().executeQuery(query);
+		while(res.next()) {
+			nameCus = "Khách hàng: " + res.getString(1) + "/Sđt: " + res.getString(2);
+		}
+		return nameCus;
+	}
+	
+	public String getCusTop1BuyMore(String time) throws SQLException {
+		String nameCus = "";
+		String query = "";
+		switch (time.toUpperCase()) {
+		case "DAY": {
+			query = "select top 1 kh.maKhachHang,hoTenKH,count(maHoaDon) from HoaDon as hd\r\n"
+					+ "join KhachHang as kh on hd.maKhachHang = kh.maKhachHang\r\n"
+					+ "where day(ngayLapHoaDon) = day(getdate())\r\n"
+					+ "and month(ngayLapHoaDon) = month(getdate())\r\n"
+					+ "and year(ngayLapHoaDon) = year(getdate())\r\n"
+					+ "group by kh.maKhachHang,hoTenKH\r\n"
+					+ "order by count(maHoaDon) desc";
+			
+			break;
+		}
+		case "MONTH": {
+			query = "select top 1 kh.maKhachHang,hoTenKH,count(maHoaDon) from HoaDon as hd\r\n"
+					+ "join KhachHang as kh on hd.maKhachHang = kh.maKhachHang\r\n"
+					+ "where month(ngayLapHoaDon) = month(getdate())\r\n"
+					+ "and year(ngayLapHoaDon) = year(getdate())\r\n"
+					+ "group by kh.maKhachHang,hoTenKH\r\n"
+					+ "order by count(maHoaDon) desc";
+			break;
+		}
+		case "YEAR": {
+			query = "select top 1 kh.maKhachHang,hoTenKH,count(maHoaDon) from HoaDon as hd\r\n"
+					+ "join KhachHang as kh on hd.maKhachHang = kh.maKhachHang\r\n"
+					+ "where year(ngayLapHoaDon) = year(getdate())\r\n"
+					+ "group by kh.maKhachHang,hoTenKH\r\n"
+					+ "order by count(maHoaDon) desc";
+			break;
+		}
+		default:
+			throw new IllegalArgumentException("Unexpected value: " + time);
+		}
+		
+		ResultSet res = con.createStatement().executeQuery(query);
+		while(res.next()) {
+			nameCus = "Khách hàng: " + res.getString(2) + "/đã mua: " + res.getString(3)+" đơn hàng" ;
+		}
+		return nameCus;
+	}
+	
 }

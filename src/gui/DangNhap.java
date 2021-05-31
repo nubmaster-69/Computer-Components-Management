@@ -113,11 +113,11 @@ public class DangNhap extends javax.swing.JFrame {
 		if (validateAccount()) {
 			try {
 				String userRole = dao.getEmployeeRole(txtTenDangNhap.getText().trim());
-
+				NhanVien nv = dao.getEmployeeByID(txtTenDangNhap.getText().trim());
 				if (userRole.equalsIgnoreCase("admin"))
-					new AdminFrame().setVisible(true);
+					new AdminFrame(nv).setVisible(true);
 				else
-					new EmployeeFrame().setVisible(true);
+					new EmployeeFrame(nv).setVisible(true);
 
 			} catch (SQLException e) {
 				e.printStackTrace();

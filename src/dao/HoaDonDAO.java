@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import connectDatabase.ConnectDatabase;
 import entity.HoaDon;
 import entity.KhachHang;
+import entity.LinhKien;
 import entity.NhanVien;
 
 public class HoaDonDAO {
@@ -44,7 +45,7 @@ public class HoaDonDAO {
 		String billID = "";
 		
 		try {
-			ResultSet res = con.createStatement().executeQuery("select maHoaDon from HoaDon order by maHoaDon desc");
+			ResultSet res = con.createStatement().executeQuery("select top 1 maHoaDon from HoaDon order by maHoaDon desc");
 			
 			while(res.next())
 				billID = res.getString(1);
@@ -108,5 +109,24 @@ public class HoaDonDAO {
 
 		return totalPrice;
 	}
+	
+//	public ArrayList<HoaDon> getBillByID(String category) throws SQLException {
+//		ArrayList<HoaDon> Bill = new ArrayList<>();
+//		
+//		String query = "Select * from LinhKien where loaiLinhKien like ? ";
+//		
+//		PreparedStatement pState = con.prepareStatement(query);
+//		
+//		pState.setString(1, category);
+//		
+//		ResultSet res = pState.executeQuery();
+//		
+//		while(res.next())
+//			Bill.add(new LinhKien(res.getString(1), res.getString(2), res.getString(3),
+//					res.getString(4), res.getDouble(5), res.getString(6),
+//					res.getInt(7), res.getDate(8), res.getInt(9)));
+//		
+//		return lks;
+//	}
 
 }

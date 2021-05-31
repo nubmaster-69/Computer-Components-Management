@@ -1,7 +1,6 @@
 package main;
 
 import java.awt.EventQueue;
-
 import gui.DangNhap;
 
 public class MainProgram {

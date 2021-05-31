@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import connectDatabase.ConnectDatabase;
 import entity.KhachHang;
+import entity.LinhKien;
 
 public class KhachHangDAO {
 	private Connection con;
@@ -114,5 +115,77 @@ public class KhachHangDAO {
 		pState.setString(4, maKH);
 		
 		return pState.executeUpdate() > 0;
+	}
+	
+	public ArrayList<KhachHang> getCusByID(String maKhachHang) throws SQLException {
+		ArrayList<KhachHang> Cus = new ArrayList<>();
+		
+		String query = "select * from KhachHang where maKhachHang like ? ";
+		
+		PreparedStatement pState = con.prepareStatement(query);
+		
+		pState.setString(1, maKhachHang);
+		
+		ResultSet res = pState.executeQuery();
+		
+		while(res.next()) {
+			Cus.add(new KhachHang(res.getString(1),res.getString(2),res.getString(3),res.getString(4)));
+		}
+		
+		return Cus;
+	}
+	
+	public ArrayList<KhachHang> getCusByName(String Name) throws SQLException {
+		ArrayList<KhachHang> Cus = new ArrayList<>();
+		
+		String query = "select * from KhachHang where hoTenKH like ? ";
+		
+		PreparedStatement pState = con.prepareStatement(query);
+		
+		pState.setString(1, Name);
+		
+		ResultSet res = pState.executeQuery();
+		
+		while(res.next()) {
+			Cus.add(new KhachHang(res.getString(1),res.getString(2),res.getString(3),res.getString(4)));
+		}
+		
+		return Cus;
+	}
+	
+	public ArrayList<KhachHang> getCusBySTD(String STD) throws SQLException {
+		ArrayList<KhachHang> Cus = new ArrayList<>();
+		
+		String query = "select * from KhachHang where soDienThoaiKH like ? ";
+		
+		PreparedStatement pState = con.prepareStatement(query);
+		
+		pState.setString(1, STD);
+		
+		ResultSet res = pState.executeQuery();
+		
+		while(res.next()) {
+			Cus.add(new KhachHang(res.getString(1),res.getString(2),res.getString(3),res.getString(4)));
+		}
+		
+		return Cus;
+	}
+	
+	public KhachHang getOneCusBySdt(String sdt) throws SQLException {
+		KhachHang Cus = null;
+		
+		String query = "select * from KhachHang where soDienThoaiKH like ? ";
+		
+		PreparedStatement pState = con.prepareStatement(query);
+		
+		pState.setString(1, sdt);
+		
+		ResultSet res = pState.executeQuery();
+		
+		while(res.next()) {
+			Cus =new KhachHang(res.getString(1),res.getString(2),res.getString(3),res.getString(4));
+		}
+		
+		return Cus;
 	}
 }
